@@ -1,0 +1,58 @@
+function hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+const originalColors = new Map();
+
+function setAllTextColor(color) {
+    document.querySelectorAll('*').forEach(el => {
+        if (el.childNodes.length === 1 && el.childNodes[0].nodeType === Node.TEXT_NODE) {
+            if (!originalColors.has(el)) {
+                originalColors.set(el, el.style.color);
+            }
+            el.style.color = color;
+            el.style.transition = 'color 1s linear';
+        }
+    });
+}
+
+function resetColors() {
+    originalColors.forEach((color, el) => {
+        el.style.color = color;
+    });
+    console.log('Colors reset to original values');
+}
+
+let hue = 0;
+let intervalId;
+
+function updateColor() {
+    hue = (hue + 5) % 360;
+    const newColor = hslToHex(hue, 100, 50);
+    setAllTextColor(newColor);
+}
+
+function stopColorChange() {
+    clearInterval(intervalId);
+    console.log('Color change stopped');
+    resetColors();
+}
+
+// Add transition style to <body> to affect all elements
+document.body.style.transition = 'color 1s linear';
+
+intervalId = setInterval(updateColor, 1000);
+
+console.log('Smooth color change started. Run stopColorChange() to stop and reset colors.');
+
+// To stop the color change and reset colors, run this in the console:
+// stopColorChange();
+
+// Script made by _RussianDoge on Discord | dominick22470 on SnapChat
